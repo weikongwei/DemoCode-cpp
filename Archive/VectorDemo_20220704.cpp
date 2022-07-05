@@ -130,23 +130,59 @@ public:
 		return it;
 	}
 
-	void test_loop1_vector() const {
-		printf("Account numbers: \n");
-		for (auto it = accountDB.begin(); it != accountDB.end(); it++) 
-			printf("%05d \n", it->getAccountNumb());
-	}
-
-	void test_loop2_vector() const {
-		for (auto & account : accountDB) {
-			printf("%05d \n", account.getAccountNumb());
-		}
-	}
-
-	void test_loop3_vector() const {
-		printf("Account numbers: \n");
+	void test_loop1_vector() {
+		//printf("\n");
+		//printf("*******************\n");
+		//printf("*** Test loop 1 ***\n");
+		//printf("*******************\n\n");
 		for (size_t i = 0; i < accountDB.size(); i++) {
-			printf("%05d \n", accountDB.at(i).getAccountNumb());
+			cout << accountDB.at(i).getAccountNumb() << "\n";
+			printf("Account number: %05d \n", accountDB.at(i).getAccountNumb());
+
 		}
+	}
+
+	void test_loop2_vector() {
+		//printf("\n");
+		//printf("*******************\n");
+		//printf("*** Test loop 2 ***\n");
+		//printf("*******************\n\n");
+		for (auto & account : accountDB) {
+			printf("Account number: %05d \n", account.getAccountNumb());
+		}
+	}
+
+	void test_emplace(const BankAccount & toBeInserted, const BankAccount & insertAt) {
+
+		//printf("\n");
+		//printf("*******************\n");
+		//printf("** Test Emplace ***\n");
+		//printf("*******************\n\n");
+		//int targetAccountNum = insertAt.getAccountNumb();
+		//for (auto it = accountDB.begin(); it != accountDB.end(); it++) {
+		//	if (targetAccountNum == it->getAccountNumb()) {
+		//		printf("Matching account found: %05d\n", it->getAccountNumb());
+		//		printf("Owner: %s \n", it->getOwner().c_str());
+		//		printf("Balance: %0.2f\n\n", it->getBalance());
+		//		
+		//		accountDB.emplace(it, toBeInserted);
+		//		return;
+		//	}
+		//}
+		
+		// To show the original list
+		test_loop2_vector();
+
+		auto it = search(insertAt);
+		if (it != accountDB.end()) {
+			accountDB.emplace(it, toBeInserted);
+			test_loop2_vector();
+		}
+		else
+		{
+			cout << "Account not found. \n";
+		}
+
 	}
 
 	void test_pushAndPop(const BankAccount & toBePushed) {
@@ -155,16 +191,24 @@ public:
 		printf("*** Push & Pop ****\n");
 		printf("*******************\n\n");
 
+		test_loop2_vector();
+
 		accountDB.push_back(toBePushed);
 		cout << "Accoun pushed. \n";
-		test_loop1_vector();
+		test_loop2_vector();
 
 		accountDB.pop_back();
 		cout << "Account popped. \n";
-		test_loop1_vector();
+		test_loop2_vector();
 	}
 
 	void summary() const {
+		//cout << "\n"
+		//	<< "*******************\n"
+		//	<< "*** DB Summary ***\n"
+		//	<< "*******************\n\n"
+		//	<< "DB name: " << DBname << endl
+		//	<< "Total number of accounts: " << accountDB.size() << endl;
 
 		printf("\n");
 		printf("*******************\n");
@@ -172,8 +216,12 @@ public:
 		printf("*******************\n\n");
 		printf("DB name: %s \n", DBname.c_str());
 		printf("Total number of accounts: %zu \n", accountDB.size());
-		test_loop1_vector();
-		printf("\n\n");
+		printf("Account numbers: \n");
+		for (auto & account : accountDB) {
+			printf("%05d \n", account.getAccountNumb());
+		}
+
+		cout << "\n\n";
 	}
 
 	bool ifContains(const BankAccount& account) const {
@@ -196,109 +244,6 @@ public:
 		accountDB.clear();
 	}
 
-};
-
-class AccountDatabase_vectorPointers {
-private:
-	string DBname = "";
-public:
-	vector<BankAccount*> accountDB;
-	AccountDatabase_vectorPointers() {}
-	AccountDatabase_vectorPointers(const string& name_val) { DBname = name_val; }
-	~AccountDatabase_vectorPointers() {
-		printf("Database emptied.\n\n");
-	}
-
-	// Methods
-	void createAccountToDB(const string& owner_val, double balance_val) {
-		BankAccount* account = new BankAccount(owner_val, balance_val, (accountDB.size() + 1));
-		accountDB.push_back(account);
-	}
-
-	void addAccountToDB(BankAccount* account) {
-		accountDB.push_back(account);
-	}
-
-	auto search(BankAccount* account) const {
-		int targetAccountNum = account->getAccountNumb();
-		auto it = accountDB.begin();
-		for (it; it != accountDB.end(); it++) {
-			if (targetAccountNum == (*it)->getAccountNumb()) {
-				printf("Matching account found: %05d\n", (*it)->getAccountNumb());
-				printf("Owner: %s \n", (*it)->getOwner().c_str());
-				printf("Balance: %0.2f\n\n", (*it)->getBalance());
-				return it;
-			}
-		}
-		printf("\n\n");
-		return it;
-	}
-
-	void test_loop1_vector() const {
-		printf("Account numbers: \n");
-		for (auto it = accountDB.begin(); it != accountDB.end(); it++)
-			printf("%05d \n", (*it)->getAccountNumb());
-	}
-
-	void test_loop2_vector() const {
-		for (auto & account : accountDB) {
-			printf("%05d \n", account->getAccountNumb());
-		}
-	}
-
-	void test_loop3_vector() const {
-		printf("Account numbers: \n");
-		for (size_t i = 0; i < accountDB.size(); i++) {
-			printf("%05d \n", accountDB.at(i)->getAccountNumb());
-		}
-	}
-
-	void test_pushAndPop(BankAccount * toBePushed) {
-		printf("\n");
-		printf("*******************\n");
-		printf("*** Push & Pop ****\n");
-		printf("*******************\n\n");
-
-		accountDB.push_back(toBePushed);
-		cout << "Accoun pushed. \n";
-		test_loop1_vector();
-
-		accountDB.pop_back();
-		cout << "Account popped. \n";
-		test_loop1_vector();
-	}
-
-	void summary() const {
-
-		printf("\n");
-		printf("*******************\n");
-		printf("*** DB Summary ****\n");
-		printf("*******************\n\n");
-		printf("DB name: %s \n", DBname.c_str());
-		printf("Total number of accounts: %zu \n", accountDB.size());
-		test_loop1_vector();
-		printf("\n\n");
-	}
-
-	bool ifContains(BankAccount* account) const {
-
-		auto it = search(account);
-		if (it == accountDB.end())
-			return false;
-		return true;
-	}
-
-	size_t size() const {
-		return accountDB.size();
-	}
-
-	void deleteAll() {
-		printf("\n");
-		printf("*******************\n");
-		printf("*** Delete All ****\n");
-		printf("*******************\n\n");
-		accountDB.clear();
-	}
 
 };
 
@@ -543,90 +488,21 @@ void demoforVectorOfObjects() {
 	BankAccount account(names2[2], balances2[2], 2);
 	accounts.ifContains(account);
 
-	//// Emplace
-	//printf("\n");
-	//printf("*******************\n");
-	//printf("***** Emplace *****\n");
-	//printf("*******************\n\n");
-	//BankAccount toBeInserted{ "Emplaced", 999999, 99999 };
-	//accounts.test_emplace(toBeInserted, account);
-
-	// Loops
+	// Emplace
 	printf("\n");
 	printf("*******************\n");
-	printf("**** Test Loops ***\n");
+	printf("***** Emplace *****\n");
 	printf("*******************\n\n");
+	BankAccount toBeInserted{ "Emplaced", 999999, 99999 };
+	accounts.test_emplace(toBeInserted, account);
 
-	printf("*******************\n");
-	printf("Loop 1\n");
-	accounts.test_loop1_vector();
-	printf("*******************\n");
-	printf("Loop 2\n");
-	accounts.test_loop2_vector();
-	printf("*******************\n");
-	printf("Loop 3\n");
-	accounts.test_loop3_vector();
-
-	// Push and pop
-	BankAccount toBePushed{ "Pushed", 66666666,66666 };
-	accounts.test_pushAndPop(toBePushed);
+	//// Push and pop
+	//BankAccount toBePushed{ "Pushed", 66666666,66666 };
+	//accounts.test_pushAndPop(toBePushed);
 
 	//// Delete all
 	//accounts.deleteAll();
 }
-
-void demoforVectorOfPointers() {
-	vector<string> names{ "A", "B", "C" };
-	double balances[]{ 100,200,300 };
-
-	vector<string> names2{ "AA", "BB", "CC" };
-	double balances2[]{ 111,222,333 };
-
-	AccountDatabase_vectorPointers accounts("Database1");
-
-	for (size_t i = 0; i < (names.size()); i++) {
-		accounts.createAccountToDB(names[i], balances[i]);
-	}
-	for (size_t i = 0; i < names.size(); i++) {
-		BankAccount* account = new BankAccount(names2[i], balances2[i], accounts.size() + 1);
-		accounts.addAccountToDB(account);
-	}
-
-	// Summary
-	accounts.summary();
-
-	// if Contains
-	printf("\n");
-	printf("*******************\n");
-	printf("** Finding Match **\n");
-	printf("*******************\n\n");
-	BankAccount* account = new BankAccount(names2[2], balances2[2], 2);
-	accounts.ifContains(account);
-
-	// Loops
-	printf("\n");
-	printf("*******************\n");
-	printf("**** Test Loops ***\n");
-	printf("*******************\n\n");
-
-	printf("*******************\n");
-	printf("Loop 1\n");
-	accounts.test_loop1_vector();
-	printf("*******************\n");
-	printf("Loop 2\n");
-	accounts.test_loop2_vector();
-	printf("*******************\n");
-	printf("Loop 3\n");
-	accounts.test_loop3_vector();
-
-	// Push and pop
-	BankAccount* toBePushed = new BankAccount( "Pushed", 66666666,66666 );
-	accounts.test_pushAndPop(toBePushed);
-
-	// Delete all
-	accounts.deleteAll();
-}
-
 
 //void demoforVectorOfPointers() {
 //	string names[]{ "A", "B", "C" };
@@ -669,8 +545,8 @@ void demoforVectorOfPointers() {
 int main()
 {
 	//demoforVector();
-	//demoforVectorOfObjects();
-	demoforVectorOfPointers();
+	demoforVectorOfObjects();
+	//demoforVectorOfPointers();
     return 0;
 }
 
