@@ -13,7 +13,6 @@ using std::cout;
 using std::endl;
 
 class BankAccount {
-private:
 	string owner;
 	int accountNum;
 	double balance;
@@ -37,6 +36,14 @@ public:
 		balance = source.balance;
 		printf("A copy of account %05d created.\n", accountNum);
 	}
+
+	BankAccount(BankAccount && source) {
+		owner = std::move(source.owner);
+		accountNum = source.accountNum;
+		balance = source.balance;
+		printf("Account %05d moved.\n", accountNum);
+	}
+
 	~BankAccount() {
 		printf("\n Destructor called for %05d.\n\n", accountNum);
 	}
@@ -95,7 +102,6 @@ public:
 };
 
 class MapOfObjects {
-private:
 	map<int, BankAccount> accountMap;
 
 public:
@@ -118,6 +124,10 @@ public:
 	void insertAccount(const BankAccount & account) {
 		accountMap.insert({account.getAccountNumb(),account});
 	}
+
+	//void insertAccount(BankAccount && account) {
+	//	accountMap.insert({ account.getAccountNumb(),std::move(account) });
+	//}
 
 	void addAccount(const string& owner_val, double balance_val) {
 		BankAccount account(owner_val, balance_val, (accountMap.size() + 1));
@@ -153,7 +163,6 @@ void printMap(map<string, int> m) {
 	}
 }
 
-
 void demoForMap() {
 	map<string, int> price{ {"Apple",3} };
 
@@ -188,7 +197,7 @@ void demoForMapOfObjects() {
 	}
 	for (size_t i = 0; i < 3; i++) {
 		BankAccount account(names2[i], balances2[i], m.size() + 1);
-		m.insertAccount(account);
+		m.insertAccount(std::move(account));
 	}
 
 	printf("********************\n");
