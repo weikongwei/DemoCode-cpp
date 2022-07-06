@@ -114,17 +114,13 @@ class MapOfObjects {
 
 public:
 	MapOfObjects() {}
-	MapOfObjects(const BankAccount & account) {
-		accountMap.insert({ account.getAccountNumb(),account });
-	}
 	~MapOfObjects() {
 		printf("Destructor exicuted.");
 	}
 
 	// Mehtods
 	void printOwners() const {
-		auto it = accountMap.begin();
-		for (it; it != accountMap.end(); it++) {
+		for (auto it = accountMap.begin(); it != accountMap.end(); it++) {
 			cout << it->second.getOwner() << " \n";
 		}
 	}
@@ -135,8 +131,11 @@ public:
 		}
 	}
 
-	BankAccount& find(int accountNum) {
-		return accountMap.find(accountNum)->second;
+	BankAccount* find(int accountNum) {
+		auto it = accountMap.find(accountNum);
+		if (it == accountMap.end())
+			return nullptr;
+		return &(it->second);
 	}
 
 	void insertAccount(const BankAccount & account) {
@@ -149,7 +148,7 @@ public:
 
 	void addAccount(const string& owner_val, double balance_val) {
 		BankAccount account(owner_val, balance_val, (accountMap.size() + 1));
-		accountMap.insert({ account.getAccountNumb(),account });
+		accountMap.insert({ account.getAccountNumb(),std::move(account) });
 	}
 
 	void set(int accountNum, const BankAccount & account) {
@@ -174,9 +173,6 @@ class MapOfPointers {
 
 public:
 	MapOfPointers() {}
-	MapOfPointers(BankAccount * account) {
-		accountMap.insert({ account->getAccountNumb(),account });
-	}
 	~MapOfPointers() {
 		deleteAll();
 		printf("Destructor exicuted.");
@@ -184,8 +180,7 @@ public:
 
 	// Mehtods
 	void printOwners() const {
-		auto it = accountMap.begin();
-		for (it; it != accountMap.end(); it++) {
+		for (auto it = accountMap.begin(); it != accountMap.end(); it++) {
 			cout << it->second->getOwner() << " \n";
 		}
 	}
@@ -197,7 +192,10 @@ public:
 	}
 
 	BankAccount* find(int accountNum) {
-		return accountMap.find(accountNum)->second;
+		auto it = accountMap.find(accountNum);
+		if (it == accountMap.end())
+			return nullptr;
+		return it->second;
 	}
 
 	void insertAccount(BankAccount * account) {
@@ -222,7 +220,7 @@ public:
 	}
 
 	void deleteAll() {
-		for (auto pair : accountMap)
+		for (auto & pair : accountMap)
 			delete pair.second;
 		accountMap.clear();
 	}
