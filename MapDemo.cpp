@@ -49,6 +49,14 @@ public:
 	}
 
 	// Methods
+	void operator = (const BankAccount & source)
+	{
+		owner = source.owner;
+		accountNum = source.accountNum;
+		balance = source.balance;
+		printf("A copy of account %05d created.\n", accountNum);
+	}
+
 	void setOwner(const string & name) {
 		owner = name;
 		printf("Owner name added: %s \n", owner.c_str());
@@ -117,17 +125,27 @@ public:
 	void printOwners() const {
 		auto it = accountMap.begin();
 		for (it; it != accountMap.end(); it++) {
-			cout << (*it).second.getOwner() << " \n";
+			cout << it->second.getOwner() << " \n";
 		}
+	}
+
+	void printAccounts() const {
+		for (auto & pair : accountMap) {
+			cout << " " << pair.first << ", owner " << pair.second.getOwner() << " " << "\n";
+		}
+	}
+
+	BankAccount& find(int accountNum) {
+		return accountMap.find(accountNum)->second;
 	}
 
 	void insertAccount(const BankAccount & account) {
 		accountMap.insert({account.getAccountNumb(),account});
 	}
 
-	//void insertAccount(BankAccount && account) {
-	//	accountMap.insert({ account.getAccountNumb(),std::move(account) });
-	//}
+	void insertAccount(BankAccount && account) {
+		accountMap.insert({ account.getAccountNumb(),std::move(account) });
+	}
 
 	void addAccount(const string& owner_val, double balance_val) {
 		BankAccount account(owner_val, balance_val, (accountMap.size() + 1));
@@ -142,10 +160,61 @@ public:
 		return accountMap.size();
 	}
 
+	void deleteAccount(int accountNum) {
+		accountMap.erase(accountNum);
+	}
+
+	void deleteAll() {
+		accountMap.clear();
+	}
+};
+
+class MapOfPointers {
+	map<int, BankAccount*> accountMap;
+
+public:
+	MapOfPointers() {}
+	MapOfPointers(BankAccount * account) {
+		accountMap.insert({ account->getAccountNumb(),account });
+	}
+	~MapOfPointers() {
+		deleteAll();
+		printf("Destructor exicuted.");
+	}
+
+	// Mehtods
+	void printOwners() const {
+		auto it = accountMap.begin();
+		for (it; it != accountMap.end(); it++) {
+			cout << it->second->getOwner() << " \n";
+		}
+	}
+
 	void printAccounts() const {
 		for (auto & pair : accountMap) {
-			cout << " " << pair.first << ", owner " << pair.second.getOwner() << " " << "\n";
+			cout << " " << pair.first << ", owner " << pair.second->getOwner() << " " << "\n";
 		}
+	}
+
+	BankAccount* find(int accountNum) {
+		return accountMap.find(accountNum)->second;
+	}
+
+	void insertAccount(BankAccount * account) {
+		accountMap.insert({ account->getAccountNumb(),account });
+	}
+
+	void addAccount(const string& owner_val, double balance_val) {
+		BankAccount* account = new BankAccount(owner_val, balance_val, (accountMap.size() + 1));
+		accountMap.insert({ account->getAccountNumb(),account });
+	}
+
+	void set(int accountNum, BankAccount * account) {
+		accountMap[accountNum] = account;
+	}
+
+	size_t size() const {
+		return accountMap.size();
 	}
 
 	void deleteAccount(int accountNum) {
@@ -153,6 +222,8 @@ public:
 	}
 
 	void deleteAll() {
+		for (auto pair : accountMap)
+			delete pair.second;
 		accountMap.clear();
 	}
 };
@@ -226,10 +297,54 @@ void demoForMapOfObjects() {
 	m.deleteAll();
 }
 
+void demoForMapOfPointers() {
+	string names[]{ "A", "B", "C" };
+	double balances[]{ 100,200,300 };
+
+	string  names2[]{ "AA", "BB", "CC" };
+	double balances2[]{ 111,222,333 };
+
+	MapOfPointers m;
+
+	for (size_t i = 0; i < 3; i++) {
+		m.addAccount(names[i], balances[i]);
+	}
+	for (size_t i = 0; i < 3; i++) {
+		BankAccount* account = new BankAccount(names2[i], balances2[i], m.size() + 1);
+		m.insertAccount(account);
+	}
+
+	printf("********************\n");
+	printf("* Initializing map *\n");
+	printf("********************\n");
+	m.printAccounts();
+
+	printf("*********************\n");
+	printf("* Delete An Account *\n");
+	printf("*********************\n");
+	m.deleteAccount(1);
+	m.printAccounts();
+
+	printf("*********************\n");
+	printf("* Delete An Account *\n");
+	printf("*********************\n");
+	BankAccount* account = new BankAccount("99999", 99999, 99999);
+	BankAccount* account2 = new BankAccount("66666", 66666, 1);
+	m.set(99999, account);
+	m.set(1, account2);
+	m.printAccounts();
+
+	printf("**************\n");
+	printf("* Delete All *\n");
+	printf("**************\n");
+	m.deleteAll();
+}
+
 int main()
 {
 	//demoForMap();
-	demoForMapOfObjects();
+	//demoForMapOfObjects();
+	demoForMapOfPointers();
     return 0;
 }
 
